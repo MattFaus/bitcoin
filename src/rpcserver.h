@@ -8,6 +8,7 @@
 
 #include "uint256.h"
 #include "rpcprotocol.h"
+#include "sync.h"
 
 #include <list>
 #include <map>
@@ -99,6 +100,7 @@ extern void InitRPCMining();
 extern void ShutdownRPCMining();
 
 extern int64_t nWalletUnlockTime;
+extern CCriticalSection cs_nWalletUnlockTime;
 extern int64_t AmountFromValue(const json_spirit::Value& value);
 extern json_spirit::Value ValueFromAmount(int64_t amount);
 extern double GetDifficulty(const CBlockIndex* blockindex = NULL);

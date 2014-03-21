@@ -24,7 +24,7 @@ using namespace boost::assign;
 using namespace json_spirit;
 
 int64_t nWalletUnlockTime;
-static CCriticalSection cs_nWalletUnlockTime;
+CCriticalSection cs_nWalletUnlockTime;
 
 std::string HelpRequiringPassphrase()
 {
@@ -339,6 +339,7 @@ Value sendtoaddress(const Array& params, bool fHelp)
     if (params.size() > 3 && params[3].type() != null_type && !params[3].get_str().empty())
         wtx.mapValue["to"]      = params[3].get_str();
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
@@ -418,6 +419,7 @@ Value signmessage(const Array& params, bool fHelp)
             + HelpExampleRpc("signmessage", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XZ\", \"my message\"")
         );
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     string strAddress = params[0].get_str();
@@ -773,6 +775,7 @@ Value sendfrom(const Array& params, bool fHelp)
     if (params.size() > 5 && params[5].type() != null_type && !params[5].get_str().empty())
         wtx.mapValue["to"]      = params[5].get_str();
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     // Check funds
@@ -850,6 +853,7 @@ Value sendmany(const Array& params, bool fHelp)
         vecSend.push_back(make_pair(scriptPubKey, nAmount));
     }
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     // Check funds
@@ -1542,6 +1546,7 @@ Value keypoolrefill(const Array& params, bool fHelp)
         kpSize = (unsigned int)params[0].get_int();
     }
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
     pwalletMain->TopUpKeyPool(kpSize);
 
@@ -1918,6 +1923,3 @@ Value getwalletinfo(const Array& params, bool fHelp)
         obj.push_back(Pair("unlocked_until", (boost::int64_t)nWalletUnlockTime));
     return obj;
 }
-
-
-

@@ -19,6 +19,7 @@
 using namespace json_spirit;
 using namespace std;
 
+CCriticalSection cs_nWalletUnlockTime;
 void EnsureWalletIsUnlocked();
 
 std::string static EncodeDumpTime(int64_t nTime) {
@@ -55,7 +56,7 @@ std::string DecodeDumpString(const std::string &str) {
     for (unsigned int pos = 0; pos < str.length(); pos++) {
         unsigned char c = str[pos];
         if (c == '%' && pos+2 < str.length()) {
-            c = (((str[pos+1]>>6)*9+((str[pos+1]-'0')&15)) << 4) | 
+            c = (((str[pos+1]>>6)*9+((str[pos+1]-'0')&15)) << 4) |
                 ((str[pos+2]>>6)*9+((str[pos+2]-'0')&15));
             pos += 2;
         }
@@ -85,6 +86,7 @@ Value importprivkey(const Array& params, bool fHelp)
             + HelpExampleRpc("importprivkey", "\"mykey\", \"testing\", false")
         );
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     string strSecret = params[0].get_str();
@@ -150,6 +152,7 @@ Value importwallet(const Array& params, bool fHelp)
             + HelpExampleRpc("importwallet", "\"test\"")
         );
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     ifstream file;
@@ -239,6 +242,7 @@ Value dumpprivkey(const Array& params, bool fHelp)
             + HelpExampleRpc("dumpprivkey", "\"myaddress\"")
         );
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     string strAddress = params[0].get_str();
@@ -268,6 +272,7 @@ Value dumpwallet(const Array& params, bool fHelp)
             + HelpExampleRpc("dumpwallet", "\"test\"")
         );
 
+    LOCK(cs_nWalletUnlockTime);
     EnsureWalletIsUnlocked();
 
     ofstream file;
