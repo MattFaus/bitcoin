@@ -1685,9 +1685,7 @@ Value walletlock(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_WRONG_ENC_STATE, "Error: running with an unencrypted wallet, but walletlock was called.");
 
     {
-        LOCK(cs_nWalletUnlockTime);
-        pwalletMain->Lock();
-        nWalletUnlockTime = 0;
+        LockWallet(pwalletMain);
     }
 
     return Value::null;
